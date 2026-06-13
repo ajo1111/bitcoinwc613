@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>FIFA — Finance is Freedom Agency</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F5F0E8;color:#111}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+
+/* ALL screens hidden by default — JS sets style.display directly, no class fighting */
+.screen{display:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dropPin{from{opacity:0;transform:translate(-50%,-300%)}to{opacity:1;transform:translate(-50%,-100%)}}
+@keyframes chestPop{0%{transform:scale(1)}40%{transform:scale(1.4)rotate(-8deg)}100%{transform:scale(1.15)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.ani{animation:fadeUp .35s ease both}
+
+/* ── PROGRESS ── */
+#prog-bar{position:sticky;top:0;z-index:999;background:#111;padding:7px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+#prog-track{flex:1;height:5px;background:#1E1E1E;border-radius:3px}
+#prog-fill{height:100%;background:#E8820C;border-radius:3px;width:0;transition:width .5s ease}
+#prog-pct{font-size:11px;color:#555;min-width:28px;text-align:right}
+
+/* ── SHARED ── */
+.top-orange{background:#E8820C;padding:10px 20px;display:flex;justify-content:space-between;align-items:center}
+.top-logo{font-weight:900;font-size:20px;color:#111;letter-spacing:3px}
+.top-tag{font-size:9px;color:#111;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.eyebrow{font-size:10px;color:#E8820C;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.sec-h{font-size:23px;font-weight:900;color:#111;line-height:1.15;margin-bottom:14px}
+.sec-h-lt{font-size:23px;font-weight:900;color:#fff;line-height:1.15;margin-bottom:14px}
+.btn-main{display:block;width:100%;padding:15px;background:#E8820C;color:#111;font-weight:900;font-size:15px;border:none;border-radius:10px;letter-spacing:1.5px;text-transform:uppercase;transition:opacity .2s;text-align:center}
+.btn-main:disabled{background:#333;color:#555;cursor:not-allowed}
+.btn-main:not(:disabled):hover{opacity:.88}
+.white-card{background:#fff;border-radius:14px;padding:16px;border:1px solid #E8E0D4}
+.opt{width:100%;text-align:left;padding:13px 16px;margin-bottom:8px;background:#fff;color:#111;border:2px solid #DDD;border-radius:10px;font-size:13px;transition:all .15s}
+.opt.sel{background:#111;color:#E8820C;border-color:#E8820C;font-weight:700}
+
+/* ── GATE ── */
+#screen-gate{background:#111;min-height:100vh;flex-direction:column}
+.gate-title{font-size:40px;font-weight:900;color:#fff;line-height:1.0;margin-bottom:12px}
+.gate-title em{color:#E8820C;font-style:normal}
+.gate-meta{font-size:13px;color:#666;line-height:1.85}
+.fi{width:100%;padding:14px 16px;background:#0D0D0D;border:1.5px solid #1E1E1E;border-radius:10px;color:#fff;font-size:16px;margin-bottom:14px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:#E8820C}
+
+/* ── VIDEO ── */
+#screen-video{background:#111;min-height:100vh;flex-direction:column}
+.vid-wrap{background:#0D0D0D;border-radius:14px;overflow:hidden;position:relative;padding-bottom:56.25%;border:1px solid #1E1E1E;margin-bottom:18px}
+.vid-wrap iframe{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vid-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#444}
+
+/* ── SURVEY 1 ── */
+#screen-survey1{background:#F5F0E8;min-height:100vh;flex-direction:column}
+
+/* ── MAIN ── */
+#screen-main{background:#F5F0E8;min-height:100vh}
+
+/* FIFA rows */
+.fifa-row{display:flex;gap:14px;align-items:flex-start;background:#0D0D0D;border-radius:12px;padding:14px 16px;border-left:4px solid #E8820C;margin-bottom:10px}
+.fifa-l{font-size:46px;font-weight:900;color:#E8820C;line-height:.9;min-width:44px;text-align:center}
+.fifa-w{font-size:16px;font-weight:900;color:#fff;margin-bottom:4px}
+.fifa-d{font-size:12px;color:#777;line-height:1.55}
+
+/* Host cards */
+.hcard{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.hav{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0;border:2.5px solid #E8820C}
+
+/* Glossary */
+.search-wrap{position:relative;margin-bottom:12px}
+.search-in{width:100%;padding:12px 40px 12px 42px;background:#fff;border:1.5px solid #DDD;border-radius:12px;font-size:14px;color:#111;outline:none;transition:border-color .2s}
+.search-in:focus{border-color:#E8820C}
+.s-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.s-clr{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;color:#AAA;padding:4px;display:none}
+.lpills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.lp{width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:700;border:1.5px solid #DDD;background:#fff;color:#888;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.lp.on{background:#E8820C;color:#111;border-color:#E8820C}
+.tcard{background:#fff;border:1.5px solid #E8E0D4;border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;border-left:4px solid #E8E0D4;text-align:left;width:100%;margin-bottom:8px;display:block}
+.tcard.open{border-color:#E8820C;border-left-color:#E8820C}
+.thead{display:flex;justify-content:space-between;align-items:center}
+.tinner{display:flex;gap:10px;align-items:center}
+.tarr{font-size:13px;color:#CCC;transition:transform .2s;display:inline-block}
+.tcard.open .tarr{transform:rotate(180deg);color:#E8820C}
+.tdef{font-size:13px;color:#555;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid #EEE;display:none}
+.tcard.open .tdef{display:block}
+
+/* Run of show */
+.ros-item{display:flex;position:relative}
+.ros-dots{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
+.ros-dot{width:11px;height:11px;border-radius:50%;background:#E8820C;margin-top:18px;flex-shrink:0}
+.ros-dot.dim{background:#333}
+.ros-line{width:2px;flex:1;background:#1E1E1E;min-height:14px}
+.ros-info{flex:1;padding:12px 0 12px 8px}
+.ros-t{font-size:10px;color:#E8820C;font-weight:700;letter-spacing:.5px;margin-bottom:2px}
+.ros-s{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.ros-n{font-size:11px;color:#666}
+
+/* Survey 2 */
+.s2hdr{background:#111;border-radius:14px;padding:18px 20px;margin-bottom:22px;border:1px solid rgba(232,130,12,.2)}
+.star-row{display:flex;gap:8px;justify-content:center;padding:10px 0}
+.star{font-size:36px;background:none;border:none;cursor:pointer;opacity:.2;transition:opacity .15s;padding:4px}
+.star.on{opacity:1}
+
+/* Treasure / Map */
+#screen-treasure{background:#111;min-height:100vh;flex-direction:column}
+.map-box{background:#0A1A0A;border-radius:16px;margin:0 20px 18px;position:relative;height:220px;border:1px solid #1A3A1A;overflow:hidden}
+.msh{position:absolute;left:0;right:0;height:1px;background:#1A3A1A}
+.msv{position:absolute;top:0;bottom:0;width:1px;background:#1A3A1A}
+.mlbl{position:absolute;font-size:6px;color:#2A5A2A;white-space:nowrap}
+#map-pin{position:absolute;left:38%;top:50%;transform:translate(-50%,-100%);flex-direction:column;align-items:center;animation:dropPin .6s ease-out both;z-index:10;display:none}
+#map-pin.show{display:flex}
+.ptri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid #E8820C;margin:0 auto}
+#map-chest{position:absolute;left:38%;top:68%;transform:translateX(-50%);flex-direction:column;align-items:center;z-index:10;display:none}
+#map-chest.show{display:flex}
+#chest-em{font-size:38px;cursor:pointer;transition:font-size .3s;display:block}
+.chest-tip{font-size:9px;color:#E8820C;font-weight:900;text-align:center;margin-top:4px;animation:pulse 1.5s infinite}
+
+/* Collector Cards */
+#screen-cards{background:#111;min-height:100vh;flex-direction:column}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.cc{border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;border:1.5px solid rgba(255,255,255,.08);transition:transform .2s;animation:cardIn .4s ease both}
+.cc:hover{transform:scale(1.02)}
+.cc-rar{font-size:8px;letter-spacing:1.5px;font-weight:900;margin-bottom:8px;display:inline-block;padding:2px 7px;border-radius:10px}
+.cc-em{font-size:34px;margin:5px 0}
+.cc-nm{font-size:12px;font-weight:900;line-height:1.2;margin-bottom:3px}
+.cc-sb{font-size:9px;color:#555;line-height:1.3}
+.cc7{width:100%;border-radius:14px;padding:16px;border:2px solid;display:flex;gap:14px;align-items:center;margin-bottom:10px;cursor:pointer;transition:transform .2s;animation:cardIn .5s ease .48s both;opacity:0}
+.cc7.ani-done{opacity:1}
+.cc7:hover{transform:scale(1.01)}
+
+/* Card detail */
+#screen-card-detail{background:#111;min-height:100vh;flex-direction:column;align-items:flex-start}
+.back-btn{background:none;border:none;color:#E8820C;font-size:14px;font-weight:700;padding:16px 22px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="prog-bar">
+  <span style="font-size:13px;color:#E8820C;font-weight:900;letter-spacing:2px">FIFA</span>
+  <div id="prog-track"><div id="prog-fill"></div></div>
+  <span id="prog-pct">0%</span>
+</div>
+
+<!-- ══ GATE ═════════════════════════════════════════════════ -->
+<div id="screen-gate" class="screen">
+  <div class="top-orange">
+    <span class="top-logo">FIFA</span>
+    <span class="top-tag">Financial Empowerment Series</span>
+  </div>
+  <div style="padding:26px 22px 20px;border-bottom:1px solid #1E1E1E" class="ani">
+    <div class="eyebrow">Bitcoin Education Event · Oakland</div>
+    <div class="gate-title">Finance<br/><em>is</em> Freedom<br/>Agency</div>
+    <div class="gate-meta">📅 June 13, 2026 &nbsp;·&nbsp; 12pm – 3pm<br/>📍 Queen Hippie Gypsy · Oakland, CA</div>
+  </div>
+  <div style="padding:24px 22px;flex:1" class="ani">
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px">Welcome! Register to enter.</div>
+    <div style="font-size:13px;color:#666;margin-bottom:22px;line-height:1.6">Enter your name and email to unlock the full event experience and earn your 7 collector cards.</div>
+    <div class="eyebrow">Your Name</div>
+    <input class="fi" id="inp-name" type="text" placeholder="First & Last Name" oninput="chkGate()" />
+    <div class="eyebrow" style="margin-top:4px">Email Address</div>
+    <input class="fi" id="inp-email" type="email" placeholder="your@email.com" oninput="chkGate()" onkeydown="if(event.key==='Enter')doRegister()" />
+    <button class="btn-main" id="gate-btn" disabled onclick="doRegister()">Enter the Event ₿</button>
+    <div style="text-align:center;font-size:11px;color:#444;margin-top:14px;line-height:1.6">Keep this page open during the event —<br/>your reference guide &amp; path to collector cards.</div>
+  </div>
+  <div style="padding:14px 22px;border-top:1px solid #1A1A1A;display:flex;gap:12px;align-items:center">
+    <div style="width:36px;height:36px;border-radius:50%;background:#E8820C;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#111;flex-shrink:0">₿</div>
+    <div>
+      <div style="font-size:11px;color:#fff;font-weight:700">Bitcoin WellCovered</div>
+      <div style="font-size:10px;color:#444">A Bitcoin WellCovered Event · Oakland, CA</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIDEO ════════════════════════════════════════════════ -->
+<div id="screen-video" class="screen">
+  <div style="background:#E8820C;padding:13px 20px">
+    <div style="font-weight:900;font-size:15px;color:#111" id="vid-name">Welcome! 👋</div>
+  </div>
+  <div style="padding:22px 22px;flex:1" class="ani">
+    <div class="eyebrow">Intro from Bitcoin WellCovered</div>
+    <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:18px">Before We Begin</div>
+    <div class="vid-wrap" id="vid-wrap">
+      <div class="vid-ph">
+        <div style="font-size:52px;margin-bottom:10px">▶</div>
+        <div style="font-size:13px">Video intro</div>
+        <div style="font-size:11px;margin-top:4px;color:#333">Add YouTube video ID to go live</div>
+      </div>
+    </div>
+    <div style="background:#0D0D0D;border-radius:12px;padding:16px;margin-bottom:22px;border-left:4px solid #E8820C">
+      <p style="font-size:14px;color:#BBB;line-height:1.7"><strong style="color:#E8820C">Keep this page open</strong> on your phone throughout the event. It's your reference guide for everything the speakers mention today.</p>
+    </div>
+    <button class="btn-main" onclick="go('survey1')">Let's Go →</button>
+  </div>
+</div>
+
+<!-- ══ SURVEY 1 ══════════════════════════════════════════════ -->
+<div id="screen-survey1" class="screen">
+  <div style="background:#111;padding:18px 22px">
+    <div class="eyebrow" style="margin-bottom:4px">Quick Check-In</div>
+    <div style="font-size:22px;font-weight:900;color:#fff">Before we begin…</div>
+    <div style="font-size:13px;color:#888;margin-top:4px">2 quick questions — no wrong answers!</div>
+  </div>
+  <div style="padding:22px;flex:1" class="ani">
+    <div style="margin-bottom:26px">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;line-height:1.4"><span style="color:#E8820C">1. </span>Have you heard of Bitcoin before today?</div>
+      <button class="opt" onclick="pickQ('q1',this)">Yes, I know it well 🙌</button>
+      <button class="opt" onclick="pickQ('q1',this)">I've heard of it but know little 🤔</button>
+      <button class="opt" onclick="pickQ('q1',this)">This is brand new to me ✨</button>
+    </div>
+    <div style="margin-bottom:26px">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;line-height:1.4"><span style="color:#E8820C">2. </span>Have you ever paid for something using Bitcoin?</div>
+      <button class="opt" onclick="pickQ('q2',this)">Yes! ₿</button>
+      <button class="opt" onclick="pickQ('q2',this)">No, but I want to 🔥</button>
+      <button class="opt" onclick="pickQ('q2',this)">I didn't know that was possible 😮</button>
+    </div>
+    <button class="btn-main" id="s1-btn" disabled onclick="doS1()">Enter the Event →</button>
+  </div>
+</div>
+
+<!-- ══ MAIN (scrollable reference + survey 2) ════════════════ -->
+<div id="screen-main" class="screen">
+
+  <!-- Welcome -->
+  <div style="background:#111;padding:26px 22px">
+    <div class="eyebrow" id="main-hi">Welcome!</div>
+    <div style="font-size:26px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:12px">Finance is Freedom Agency</div>
+    <div style="font-size:13px;color:#777;line-height:1.85;margin-bottom:16px">
+      📅 June 13, 2026 &nbsp;·&nbsp; 12pm – 3pm<br/>
+      📍 Queen Hippie Gypsy<br/>
+      <span style="font-size:11px;color:#555">337 14th St, Oakland, CA 94612</span>
+    </div>
+    <div style="background:#0D0D0D;border-radius:10px;padding:14px;border-left:4px solid #E8820C">
+      <p style="font-size:13px;color:#AAA;font-style:italic;line-height:1.6">"Bitcoin is the playing field. Agency is knowing the rules."</p>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div style="padding:24px 22px;background:#EDE5D8">
+    <div class="eyebrow">About Today</div>
+    <div class="sec-h">Why We're Here</div>
+    <p style="font-size:14px;color:#444;line-height:1.75;margin-bottom:12px">Money has always been about power — who controls it, who distributes it, and who gets left out. Today we change that conversation.</p>
+    <p style="font-size:14px;color:#444;line-height:1.75;margin-bottom:12px">Whether you've never heard of a wallet or you're already stacking sats — this event meets you where you are and walks you through Bitcoin as an asset, open source technology, and living currency built for the people.</p>
+    <div style="background:#fff;border-radius:10px;padding:14px;border-left:4px solid #E8820C">
+      <p style="font-size:14px;font-weight:600;color:#111;line-height:1.6"><span style="color:#E8820C">Receive the currency. Distribute it to your community.</span> Flow is the principle. Freedom is what it creates. Agency is what you do with it.</p>
+    </div>
+  </div>
+
+  <!-- FIFA -->
+  <div style="background:#111;padding:24px 22px">
+    <div class="eyebrow">The Theme</div>
+    <div class="sec-h-lt">What FIFA Means</div>
+    <div class="fifa-row"><div class="fifa-l">F</div><div><div class="fifa-w">Finance</div><div class="fifa-d">The system Bitcoin is transforming — from Wall Street to Main Street and back into community hands.</div></div></div>
+    <div class="fifa-row"><div class="fifa-l">I</div><div><div class="fifa-w">is</div><div class="fifa-d">The bridge connecting individual agency to the global financial system.</div></div></div>
+    <div class="fifa-row"><div class="fifa-l">F</div><div><div class="fifa-w">Freedom</div><div class="fifa-d">The foundational promise of Bitcoin — borderless, permissionless, unstoppable.</div></div></div>
+    <div class="fifa-row"><div class="fifa-l">A</div><div><div class="fifa-w">Agency</div><div class="fifa-d">The ability to act — own your keys, own your future, on your terms and in community and collaboration.</div></div></div>
+  </div>
+
+  <!-- Hosts -->
+  <div style="padding:24px 22px;background:#F5F0E8">
+    <div class="eyebrow">Your Hosts</div>
+    <div class="sec-h">Meet the Speakers</div>
+    <div class="white-card hcard">
+      <div class="hav" style="background:#E8820C;color:#111">A</div>
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#111">Allison Jones</div>
+        <div style="font-size:11px;color:#888;margin-top:2px;line-height:1.4">Bitcoin Developer &amp; Circular Economy Advocate</div>
+        <span style="display:inline-block;margin-top:6px;background:rgba(232,130,12,.1);color:#E8820C;font-size:9px;padding:3px 9px;border-radius:5px;font-weight:700;border:1px solid rgba(232,130,12,.3)">ABC's of Bitcoin</span>
+      </div>
+    </div>
+    <div class="white-card hcard" style="margin-top:12px">
+      <div class="hav" style="background:#111;color:#E8820C">S</div>
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#111">Stephisha Ycoy-Walton</div>
+        <div style="font-size:11px;color:#888;margin-top:2px;line-height:1.4">Financial Advisor &amp; Wealth Management Expert</div>
+        <span style="display:inline-block;margin-top:6px;background:rgba(0,0,0,.05);color:#444;font-size:9px;padding:3px 9px;border-radius:5px;font-weight:700;border:1px solid #DDD">Wall St. &amp; ETFs</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning Outcomes -->
+  <div style="background:#111;padding:24px 22px">
+    <div class="eyebrow">Learning Outcomes</div>
+    <div class="sec-h-lt">What You'll Leave With</div>
+    <div id="outcomes"></div>
+  </div>
+
+  <!-- ABC's Glossary -->
+  <div style="padding:24px 22px;background:#F5F0E8">
+    <div class="eyebrow">Reference Guide</div>
+    <div class="sec-h">ABC's of Bitcoin</div>
+    <p style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.55">Your glossary for everything mentioned today. Search or browse by letter.</p>
+    <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input class="search-in" id="gl-search" type="text" placeholder="Search terms…" oninput="renderGL()"/>
+      <button class="s-clr" id="s-clr" onclick="clrSearch()">✕</button>
+    </div>
+    <div class="lpills" id="lpills"></div>
+    <div id="gl-lbl" style="font-size:10px;color:#E8820C;font-weight:700;letter-spacing:1.5px;margin-bottom:12px"></div>
+    <div id="gl-list"></div>
+  </div>
+
+  <!-- Run of Show -->
+  <div style="background:#111;padding:24px 22px">
+    <div class="eyebrow">Today's Schedule</div>
+    <div class="sec-h-lt">Run of Show</div>
+    <button id="ros-btn" onclick="togRos()" style="width:100%;padding:12px 16px;background:#0D0D0D;color:#fff;border:1.5px solid #222;border-radius:10px;font-size:14px;font-weight:700;text-align:center;margin-bottom:0;transition:all .2s">View Full Schedule ▼</button>
+    <div id="ros-list" style="display:none;flex-direction:column;margin-top:16px"></div>
+  </div>
+
+  <!-- Bridge -->
+  <div style="background:#F5F0E8;padding:28px 22px;text-align:center">
+    <div style="font-size:20px;font-weight:900;color:#111;margin-bottom:8px">Ready to unlock your cards?</div>
+    <div style="font-size:13px;color:#666;margin-bottom:0;line-height:1.55">Complete the post-event survey below and earn your 7 collector cards 🃏</div>
+  </div>
+
+  <!-- ── SURVEY 2 (embedded in main) ── -->
+  <div style="padding:22px 22px 32px;background:#F5F0E8">
+    <div class="s2hdr">
+      <div class="eyebrow" style="margin-bottom:4px">Almost There!</div>
+      <div style="font-size:22px;font-weight:900;color:#fff">Event Feedback</div>
+      <div style="font-size:13px;color:#888;margin-top:4px">Complete this to unlock your 7 collector cards 🃏</div>
+    </div>
+    <div id="s2-qs"></div>
+    <button class="btn-main" id="s2-btn" disabled onclick="doS2()">Unlock My Cards 🃏</button>
+  </div>
+
+</div><!-- end screen-main -->
+
+<!-- ══ TREASURE ══════════════════════════════════════════════ -->
+<div id="screen-treasure" class="screen">
+  <div style="background:#E8820C;padding:14px 20px;text-align:center">
+    <div style="font-weight:900;font-size:17px;color:#111" id="tr-name">🎉 Congrats!</div>
+    <div style="font-size:11px;color:#111;margin-top:2px">Your collector cards are hidden nearby…</div>
+  </div>
+  <div style="padding:20px;flex:1;display:flex;flex-direction:column">
+    <div style="font-size:14px;color:#777;margin-bottom:18px;text-align:center;line-height:1.7">
+      Your 7 collector cards are somewhere on this map.<br/>
+      <span style="color:#E8820C;font-weight:700">Can you find the treasure? 🗺️</span>
+    </div>
+    <!-- MAP -->
+    <div class="map-box">
+      <div class="msh" style="top:16%"></div><div class="msh" style="top:36%"></div>
+      <div class="msh" style="top:56%"></div><div class="msh" style="top:76%"></div>
+      <div class="msv" style="left:15%"></div><div class="msv" style="left:33%"></div>
+      <div class="msv" style="left:51%"></div><div class="msv" style="left:69%"></div>
+      <div class="mlbl" style="left:3px;top:8%">12th St</div>
+      <div class="mlbl" style="left:3px;top:28%">13th St</div>
+      <div class="mlbl" style="left:3px;top:48%">14th St</div>
+      <div class="mlbl" style="left:3px;top:68%">15th St</div>
+      <div class="mlbl" style="top:3px;left:17%">Broadway</div>
+      <div class="mlbl" style="top:3px;left:35%">Telegraph</div>
+      <div class="mlbl" style="top:3px;left:53%">Harrison</div>
+      <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);font-size:7px;color:#2A5A2A;letter-spacing:1px;white-space:nowrap">DOWNTOWN OAKLAND</div>
+      <div id="map-pin">
+        <div style="background:#E8820C;color:#111;border-radius:6px;padding:4px 8px;font-size:8px;font-weight:900;white-space:nowrap;margin-bottom:3px">📍 Queen Hippie Gypsy</div>
+        <div class="ptri"></div>
+      </div>
+      <div id="map-chest">
+        <div id="chest-em" onclick="openChest()">🎁</div>
+        <div class="chest-tip" id="chest-tip">Tap to open!</div>
+      </div>
+    </div>
+    <div style="margin-top:auto">
+      <button class="btn-main" id="tr-btn" onclick="trNext()">Find My Cards 🗺️</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARDS ═════════════════════════════════════════════════ -->
+<div id="screen-cards" class="screen">
+  <div style="background:#E8820C;padding:14px 20px;text-align:center">
+    <div style="font-weight:900;font-size:17px;color:#111" id="cards-name">🎉 Your Collection!</div>
+    <div style="font-size:11px;color:#111;margin-top:2px">7 FIFA 2026 Collector Cards</div>
+  </div>
+  <div style="padding:20px;flex:1">
+    <div style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.55">Tap any card to view it in full. Show this screen at the door to collect your physical cards! 🃏</div>
+    <div class="cgrid" id="cgrid"></div>
+    <div id="c7wrap"></div>
+    <div style="background:#0D0D0D;border-radius:12px;padding:16px;text-align:center;border:1px solid rgba(232,130,12,.2)">
+      <div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:4px">Collect Your Physical Cards</div>
+      <div style="font-size:11px;color:#666;line-height:1.5;margin-bottom:10px">Show this screen at the door to receive your 7 physical collector cards. Thank you for attending Finance is Freedom Agency 2026!</div>
+      <div style="font-size:22px">₿ 🙏 ₿</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD DETAIL ═══════════════════════════════════════════ -->
+<div id="screen-card-detail" class="screen">
+  <button class="back-btn" onclick="go(prevScreen)">← Back to Collection</button>
+  <div style="width:100%;max-width:320px;margin:0 auto;padding:0 20px;animation:cardIn .4s ease both" id="card-detail"></div>
+</div>
+
+<script>
+/* ── CONFIG ─────────────────────────────── */
+var SHEETS_URL = "https://script.google.com/macros/s/AKfycbzS7EXudhyfQD4-4Ep0klsTWzsPQXhy5AiZlpbS3nH3LayvlKD-SNGDyvl1ABQesXA/exec";
+var YT_ID = "k75lNbkHxNU";
+/*
+GOOGLE SHEETS SETUP:
+1. script.google.com → New Project → paste:
+   function doPost(e){
+     var s=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+     var d=JSON.parse(e.postData.contents);
+     s.appendRow([new Date(),d.type,d.name||"",d.email||"",JSON.stringify(d)]);
+     return ContentService.createTextOutput("OK");
+   }
+2. Deploy → New Deployment → Web App → Anyone → copy URL above
+*/
+
+/* ── STATE ──────────────────────────────── */
+var curScreen = "gate";
+var prevScreen = "cards";
+var user = {name:"",email:""};
+var s1 = {}, s2ans = {}, stars = 0;
+var openTerm = null;
+var glLetter = "A";
+var rosOpen = false;
+var mapStage = "map";
+
+/* ── DATA ───────────────────────────────── */
+var OUTCOMES = [
+  "An understanding of Bitcoin as a scarce, sovereign asset",
+  "How Bitcoin's open source protocol works and why it matters",
+  "The difference between exchange custody vs. self-custody",
+  "How to make your first Bitcoin purchase — right here, today!",
+  "What financial agency looks like in practice",
+  "How Bitcoin enables circular economies in your community"
+];
+
+var GL = {
+  A:[
+    {t:"Address",e:"📍",d:"A unique string of letters and numbers where Bitcoin is sent — like an email address. Always verify before sending. Transactions are irreversible."},
+    {t:"ASIC",e:"⚙️",d:"Application-Specific Integrated Circuit — specialized hardware built solely to mine Bitcoin by solving SHA-256 mathematical puzzles at scale."},
+    {t:"Autonomy",e:"👑",d:"The core promise of Bitcoin: control your own money without permission from any bank, government, or institution. You are the bank."},
+    {t:"Actions to Take",e:"✊",d:"Get a wallet. Buy a sat. Spend at a Bitcoin merchant like Queen Hippie Gypsy today. Hold your own keys. Run a node when ready. Start now."}
+  ],
+  B:[
+    {t:"Bitcoin (BTC)",e:"₿",d:"The world's first decentralized digital currency, created in 2009. Only 21 million will ever exist — the scarcest monetary asset humans have ever created."},
+    {t:"Blockchain",e:"🔗",d:"A permanent, public, tamper-proof ledger of every Bitcoin transaction ever made — maintained simultaneously by thousands of computers worldwide."},
+    {t:"Block",e:"🧱",d:"A bundle of ~2,000 verified transactions added to the blockchain approximately every 10 minutes. Each block links to the previous one — forming the chain."},
+    {t:"Block Reward",e:"🏆",d:"Newly minted Bitcoin + fees that miners earn for adding each block. Currently 3.125 BTC per block after the April 2024 halving."},
+    {t:"Block Explorer",e:"🔍",d:"A public tool (mempool.space) letting anyone view any transaction, block, or address on Bitcoin's blockchain. Full transparency for all."},
+    {t:"Be Your Own Bank",e:"🏦",d:"With Bitcoin self-custody, you are the sole custodian of your money. No institution can freeze, seize, or limit access to your funds."},
+    {t:"Borderless",e:"🌍",d:"Bitcoin crosses any national border instantly — no exchange rate, no bank approval, no limits. Accessible to anyone with internet access worldwide."},
+    {t:"Building",e:"🏗️",d:"Bitcoin is open source — anyone can build applications, tools, and businesses on top of it. No permission, no gatekeepers required."}
+  ],
+  C:[
+    {t:"Currency",e:"💱",d:"A medium of exchange. Bitcoin is sovereign digital money — issued by no government, controlled by no institution, and cannot be printed into inflation."},
+    {t:"Cryptography",e:"🔐",d:"The advanced mathematics securing Bitcoin. Only the holder of a private key can spend their Bitcoin — no trust in any third party required."},
+    {t:"Cold Storage",e:"❄️",d:"Bitcoin stored offline on a hardware wallet (Ledger, Trezor) where it cannot be hacked remotely. The safest way to secure significant holdings."},
+    {t:"Circular Economy",e:"🔄",d:"When Bitcoin is earned, spent, and reinvested within a community — value flowing back to the people who generated it, not out to distant institutions."},
+    {t:"Confirmation",e:"✅",d:"Each new block added after your transaction gives it one more confirmation. Six or more confirmations = fully settled and irreversible."}
+  ],
+  D:[
+    {t:"Decentralization",e:"🕸️",d:"No single person, company, or government controls Bitcoin. Thousands of independent nodes validate every transaction — no headquarters, no CEO."},
+    {t:"Digital Wallet",e:"👜",d:"Software or hardware managing your private keys. Coins live on the blockchain; the wallet stores your access to them."}
+  ],
+  H:[
+    {t:"Halving",e:"✂️",d:"Every ~4 years (210,000 blocks), Bitcoin's block reward is cut in half. Programmed scarcity — built-in, predictable, and impossible to override."},
+    {t:"Hash",e:"#️⃣",d:"A mathematical fingerprint of data using SHA-256. Change any data in a block and its hash changes completely — this is how the chain is secured."},
+    {t:"HODL",e:"💎",d:"Originally a misspelled 'hold' — now the strategy of holding Bitcoin through market cycles with long-term conviction rather than panic-selling."}
+  ],
+  K:[{t:"Keys",e:"🗝️",d:"'Not your keys, not your coins.' Private key = your secret (never share it). Public key = your receiving address. Together they prove ownership."}],
+  L:[{t:"Lightning Network",e:"⚡",d:"A Layer 2 network built on Bitcoin enabling instant, near-zero-fee payments — making Bitcoin practical for everyday spending at places like Queen Hippie Gypsy."}],
+  M:[
+    {t:"Mining",e:"⛏️",d:"Validating transactions and adding blocks to the blockchain. Miners use computational power and earn Bitcoin as a reward for securing the network."},
+    {t:"Mempool",e:"⏳",d:"The waiting room for unconfirmed Bitcoin transactions. Miners select higher-fee transactions first."}
+  ],
+  N:[{t:"Node",e:"💻",d:"A computer running Bitcoin software that independently validates every transaction and block. Running a node = the highest level of Bitcoin sovereignty."}],
+  P:[
+    {t:"Peer-to-Peer (P2P)",e:"🤝",d:"Direct value transfer between two people — no bank, no payment processor, no middleman. Bitcoin was designed for P2P from the very beginning."},
+    {t:"Private Key",e:"🔒",d:"A secret 256-bit number giving complete control over your Bitcoin. Lose it = lose access forever. Share it = lose your Bitcoin immediately."}
+  ],
+  S:[
+    {t:"Satoshi (Sat)",e:"🔢",d:"The smallest Bitcoin unit: 0.00000001 BTC. One hundred million sats = 1 Bitcoin. Named after Bitcoin's pseudonymous creator, Satoshi Nakamoto."},
+    {t:"Self-Custody",e:"🛡️",d:"Holding your own private keys — not leaving Bitcoin on an exchange. Your sovereignty, your responsibility. The foundational act of financial agency."},
+    {t:"Sovereignty",e:"⚖️",d:"Financial independence from any institution. Bitcoin makes it technically possible. Self-custody makes it real. Agency makes it yours to keep."}
+  ],
+  W:[
+    {t:"Wallet",e:"💼",d:"Manages your Bitcoin private keys. Hot wallets (online) are convenient for spending. Cold wallets (offline hardware) are safest for long-term storage."},
+    {t:"Whitepaper",e:"📄",d:"Satoshi Nakamoto's 2008 paper 'Bitcoin: A Peer-to-Peer Electronic Cash System' — Bitcoin's founding document. Free at bitcoin.org/bitcoin.pdf"}
+  ]
+};
+
+var ROS = [
+  {time:"12:00pm",seg:"Doors Open & Welcome",host:"Both Hosts",note:"Arrive, connect, get set up"},
+  {time:"12:15pm",seg:"Opening — The FIFA Theme",host:"Both Hosts",note:"Finance is Freedom Agency — why we're here"},
+  {time:"12:30pm",seg:"Pillar 1: Bitcoin as Asset",host:"Both Hosts",note:"ETFs, corporate treasuries, institutional adoption"},
+  {time:"1:00pm",seg:"Pillar 2: Open Source & ABC's",host:"Allison Jones",note:"Protocol basics, self-custody, sovereignty"},
+  {time:"1:30pm",seg:"Break & Bitcoin Demo",host:"—",note:"Try buying with Bitcoin at Queen Hippie Gypsy!"},
+  {time:"1:45pm",seg:"Pillar 3: Currency & Flow",host:"Both Hosts",note:"Lightning, circular economy, everyday use"},
+  {time:"2:15pm",seg:"Q&A",host:"Both Hosts",note:"Your questions answered"},
+  {time:"2:45pm",seg:"Closing & Agency Moment",host:"Both Hosts",note:"What to do next with what you've learned"},
+  {time:"3:00pm",seg:"End — Collect Your Cards!",host:"—",note:"Complete survey to unlock 🃏"}
+];
+
+var S2Q = [
+  {id:"s1",q:"How would you rate today's event overall?",type:"stars"},
+  {id:"s2",q:"Which topic was most valuable to you today?",opts:["Bitcoin as an Asset 📈","Open Source & Protocol 🛠️","Bitcoin as Currency 💱","All of it! 🙌"]},
+  {id:"s3",q:"How well do you understand Bitcoin now vs. when you arrived?",opts:["Much clearer! 💡","Getting there 👍","I still have questions ❓","I want to keep learning 📚"]},
+  {id:"s4",q:"Would you recommend this event to others?",opts:["Absolutely! 🔥","Yes, with some changes","Maybe","I'm still processing 🤔"]},
+  {id:"s5",q:"What topic would you like to explore next?",opts:["Running a node 💻","Mining ⛏️","Lightning Network ⚡","Self-custody setup 🔐","All of the above 👆"]},
+  {id:"s6",q:"How likely are you to start using Bitcoin after today?",opts:["Starting right now! 🚀","Within the month 📅","Exploring more first 🔍","I already use it 😎"]},
+  {id:"s7",q:"What would make future events even better?",opts:["More hands-on demos 🖥️","Longer event ⏱️","More on investing 📊","More Q&A time 🙋","I loved it as-is! ❤️"]}
+];
+
+var CARDS = [
+  {id:1,name:"The Genesis",sub:"Block #0 · Jan 3, 2009",rar:"LEGENDARY",clr:"#F7931A",bg:"#180800",em:"₿",desc:"The first Bitcoin block ever mined. Satoshi embedded a headline: 'Chancellor on brink of second bailout for banks.' The founding statement of purpose."},
+  {id:2,name:"The Sovereign",sub:"Self-Custody · Your Keys",rar:"RARE",clr:"#A855F7",bg:"#110016",em:"🗝️",desc:"Not your keys, not your coins. The sovereign holds their own private keys and answers to no institution, no bank, no authority."},
+  {id:3,name:"The Flow",sub:"Circular Economy",rar:"UNCOMMON",clr:"#00D4AA",bg:"#001814",em:"🌊",desc:"Receive the currency. Distribute it to your community. Value that flows back to the people who created it — the circular economy in action."},
+  {id:4,name:"The Halving",sub:"21 Million · Scarcity",rar:"RARE",clr:"#F472B6",bg:"#18000E",em:"✂️",desc:"Every four years, the new Bitcoin supply is cut in half. 21 million cap. The most predictable monetary policy in human history."},
+  {id:5,name:"Lightning",sub:"Layer 2 · Instant Payments",rar:"UNCOMMON",clr:"#60A5FA",bg:"#000E1A",em:"⚡",desc:"Bitcoin at the speed of thought. Instant, near-zero-fee payments — making Bitcoin practical for everyday spending, right here at Queen Hippie Gypsy."},
+  {id:6,name:"The Node",sub:"Decentralization · Verify",rar:"COMMON",clr:"#4ADE80",bg:"#001008",em:"💻",desc:"Running a node means you verify truth for yourself. No trust required. The network is the people — and you can be part of it."},
+  {id:7,name:"Agency",sub:"Finance is Freedom Agency",rar:"LEGENDARY",clr:"#E8820C",bg:"#180800",em:"👑",desc:"The ability to act — own your keys, own your future, on your terms and in community and collaboration. This is why we gathered. Oakland, June 13, 2026."}
+];
+var RC = {LEGENDARY:"#F7931A",RARE:"#A855F7",UNCOMMON:"#22D3EE",COMMON:"#4ADE80"};
+var RBG = {LEGENDARY:"rgba(247,147,26,.15)",RARE:"rgba(168,85,247,.15)",UNCOMMON:"rgba(34,211,238,.1)",COMMON:"rgba(74,222,128,.1)"};
+
+/* ── NAVIGATION ─────────────────────────── */
+var FLEX_SCREENS = ["gate","video","survey1","treasure","cards","card-detail"];
+var PROG = {gate:0,video:15,survey1:30,main:55,treasure:85,"card-detail":100,cards:100};
+
+function go(id) {
+  // hide current
+  var cur = document.getElementById("screen-"+curScreen);
+  if (cur) cur.style.display = "none";
+  // show new
+  var next = document.getElementById("screen-"+id);
+  if (next) {
+    var d = "block";
+    for (var i=0; i<FLEX_SCREENS.length; i++) {
+      if (FLEX_SCREENS[i] === id) { d = "flex"; break; }
+    }
+    next.style.display = d;
+  }
+  prevScreen = curScreen;
+  curScreen = id;
+  window.scrollTo(0, 0);
+  // progress
+  var pct = PROG[id] || 0;
+  document.getElementById("prog-fill").style.width = pct + "%";
+  document.getElementById("prog-pct").textContent = pct + "%";
+}
+
+/* ── GOOGLE SHEETS ──────────────────────── */
+function send(data) {
+  if (SHEETS_URL.indexOf("https") !== 0) { console.log("Data:", data); return; }
+  fetch(SHEETS_URL, {method:"POST", mode:"no-cors", body:JSON.stringify(data), headers:{"Content-Type":"application/json"}})
+    .catch(function(e){ console.error(e); });
+}
+
+/* ── GATE ───────────────────────────────── */
+function chkGate() {
+  var n = document.getElementById("inp-name").value.trim();
+  var e = document.getElementById("inp-email").value.trim();
+  var ok = n.length > 1 && e.indexOf("@") > -1 && e.indexOf(".") > -1;
+  var btn = document.getElementById("gate-btn");
+  btn.disabled = !ok;
+  btn.style.background = ok ? "#E8820C" : "#333";
+  btn.style.color = ok ? "#111" : "#555";
+}
+
+function doRegister() {
+  var n = document.getElementById("inp-name").value.trim();
+  var e = document.getElementById("inp-email").value.trim();
+  if (!n || e.indexOf("@") < 0) return;
+  user = {name: n, email: e};
+  send({type:"registration", name:n, email:e, ts:new Date().toISOString()});
+  // video setup
+  if (YT_ID !== "YOUR_YOUTUBE_VIDEO_ID_HERE") {
+    var vw = document.getElementById("vid-wrap");
+    vw.innerHTML = '<iframe src="https://www.youtube.com/embed/'+YT_ID+'?rel=0&modestbranding=1" frameborder="0" allowfullscreen></iframe>';
+  }
+  document.getElementById("vid-name").textContent = "Hey " + n + "! 👋 Welcome to FIFA 2026";
+  go("video");
+}
+
+/* ── SURVEY 1 ───────────────────────────── */
+function pickQ(qid, btn) {
+  var parent = btn.parentNode;
+  var btns = parent.getElementsByTagName("button");
+  for (var i=0; i<btns.length; i++) btns[i].classList.remove("sel");
+  btn.classList.add("sel");
+  s1[qid] = btn.textContent;
+  var done = s1["q1"] && s1["q2"];
+  var sb = document.getElementById("s1-btn");
+  sb.disabled = !done;
+  sb.style.background = done ? "#E8820C" : "#333";
+  sb.style.color = done ? "#111" : "#555";
+}
+
+function doS1() {
+  send({type:"survey1", name:user.name, email:user.email, answers:s1, ts:new Date().toISOString()});
+  document.getElementById("main-hi").textContent = "Welcome, " + user.name + "!";
+  buildOutcomes();
+  buildGL();
+  buildROS();
+  buildS2();
+  go("main");
+}
+
+/* ── OUTCOMES ───────────────────────────── */
+function buildOutcomes() {
+  var html = "";
+  for (var i=0; i<OUTCOMES.length; i++) {
+    html += '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">'
+      + '<div style="width:26px;height:26px;background:#E8820C;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#111;flex-shrink:0;margin-top:2px">'+(i+1)+'</div>'
+      + '<div style="font-size:14px;color:#CCC;line-height:1.6">'+OUTCOMES[i]+'</div></div>';
+  }
+  document.getElementById("outcomes").innerHTML = html;
+}
+
+/* ── GLOSSARY ───────────────────────────── */
+function buildGL() {
+  var letters = Object.keys(GL);
+  var html = "";
+  for (var i=0; i<letters.length; i++) {
+    var l = letters[i];
+    html += '<button class="lp'+(l===glLetter?" on":"")+'" onclick="setLetter(\''+l+'\')">'+l+'</button>';
+  }
+  document.getElementById("lpills").innerHTML = html;
+  renderGL();
+}
+
+function setLetter(l) {
+  glLetter = l;
+  openTerm = null;
+  document.getElementById("gl-search").value = "";
+  document.getElementById("s-clr").style.display = "none";
+  var pills = document.querySelectorAll(".lp");
+  for (var i=0; i<pills.length; i++) pills[i].classList.toggle("on", pills[i].textContent === l);
+  renderGL();
+}
+
+function clrSearch() {
+  document.getElementById("gl-search").value = "";
+  document.getElementById("s-clr").style.display = "none";
+  renderGL();
+}
+
+function renderGL() {
+  var q = document.getElementById("gl-search").value.toLowerCase().trim();
+  document.getElementById("s-clr").style.display = q ? "block" : "none";
+  var terms = [];
+  if (q.length > 1) {
+    var allLetters = Object.keys(GL);
+    for (var i=0; i<allLetters.length; i++) {
+      var lt = GL[allLetters[i]];
+      for (var j=0; j<lt.length; j++) {
+        if (lt[j].t.toLowerCase().indexOf(q) > -1 || lt[j].d.toLowerCase().indexOf(q) > -1) terms.push(lt[j]);
+      }
+    }
+    document.getElementById("gl-lbl").textContent = 'RESULTS FOR "' + q.toUpperCase() + '" (' + terms.length + ')';
+    var pills = document.querySelectorAll(".lp");
+    for (var i=0; i<pills.length; i++) pills[i].classList.remove("on");
+  } else {
+    terms = GL[glLetter] || [];
+    document.getElementById("gl-lbl").textContent = "— " + glLetter + " TERMS (" + terms.length + ")";
+  }
+  if (terms.length === 0) {
+    document.getElementById("gl-list").innerHTML = '<div style="text-align:center;padding:32px;color:#AAA;font-size:14px">No results found</div>';
+    return;
+  }
+  var html = "";
+  for (var i=0; i<terms.length; i++) {
+    var t = terms[i];
+    var isOpen = openTerm === t.t;
+    html += '<button class="tcard'+(isOpen?" open":"")+'" onclick="togTerm(\''+t.t.replace(/\\/g,"\\\\").replace(/'/g,"\\'")+'\')">'
+      + '<div class="thead"><div class="tinner"><span style="font-size:22px">'+t.e+'</span><span style="font-size:15px;font-weight:700;color:#111">'+t.t+'</span></div>'
+      + '<span class="tarr">'+(isOpen?"▴":"▾")+'</span></div>'
+      + '<div class="tdef">'+t.d+'</div></button>';
+  }
+  document.getElementById("gl-list").innerHTML = html;
+}
+
+function togTerm(name) {
+  openTerm = (openTerm === name) ? null : name;
+  renderGL();
+}
+
+/* ── RUN OF SHOW ────────────────────────── */
+function buildROS() {
+  var html = "";
+  for (var i=0; i<ROS.length; i++) {
+    var r = ROS[i];
+    var isDash = r.host === "—";
+    var isLast = i === ROS.length - 1;
+    html += '<div class="ros-item">'
+      + '<div class="ros-dots"><div class="ros-dot'+(isDash?" dim":"")+'"></div>'+(isLast?"":"<div class=\"ros-line\"></div>")+'</div>'
+      + '<div class="ros-info"><div class="ros-t">'+r.time+'</div><div class="ros-s">'+r.seg+'</div>'
+      + '<div class="ros-n">'+(isDash?"":r.host+" · ")+r.note+'</div></div></div>';
+  }
+  document.getElementById("ros-list").innerHTML = html;
+}
+
+function togRos() {
+  rosOpen = !rosOpen;
+  var list = document.getElementById("ros-list");
+  var btn = document.getElementById("ros-btn");
+  list.style.display = rosOpen ? "flex" : "none";
+  list.style.flexDirection = "column";
+  btn.style.color = rosOpen ? "#E8820C" : "#fff";
+  btn.style.borderColor = rosOpen ? "#E8820C" : "#222";
+  btn.textContent = rosOpen ? "Hide Schedule ▲" : "View Full Schedule ▼";
+}
+
+/* ── SURVEY 2 ───────────────────────────── */
+function buildS2() {
+  var html = "";
+  for (var i=0; i<S2Q.length; i++) {
+    var q = S2Q[i];
+    html += '<div style="margin-bottom:24px"><div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;line-height:1.4"><span style="color:#E8820C">'+(i+1)+'. </span>'+q.q+'</div>';
+    if (q.type === "stars") {
+      html += '<div class="star-row">'
+        + '<button class="star" id="st1" onclick="setStar(1)">⭐</button>'
+        + '<button class="star" id="st2" onclick="setStar(2)">⭐</button>'
+        + '<button class="star" id="st3" onclick="setStar(3)">⭐</button>'
+        + '<button class="star" id="st4" onclick="setStar(4)">⭐</button>'
+        + '<button class="star" id="st5" onclick="setStar(5)">⭐</button>'
+        + '</div>';
+    } else {
+      for (var j=0; j<q.opts.length; j++) {
+        var o = q.opts[j];
+        html += '<button class="opt" data-qid="'+q.id+'" onclick="pickS2(\''+q.id+'\',this)">'+o+'</button>';
+      }
+    }
+    html += '</div>';
+  }
+  document.getElementById("s2-qs").innerHTML = html;
+}
+
+function setStar(n) {
+  stars = n;
+  s2ans["s1"] = n + " stars";
+  for (var i=1; i<=5; i++) {
+    var s = document.getElementById("st"+i);
+    if (s) s.classList.toggle("on", i <= n);
+  }
+  chkS2();
+}
+
+function pickS2(qid, btn) {
+  var allBtns = document.querySelectorAll('[data-qid="'+qid+'"]');
+  for (var i=0; i<allBtns.length; i++) allBtns[i].classList.remove("sel");
+  btn.classList.add("sel");
+  s2ans[qid] = btn.textContent;
+  chkS2();
+}
+
+function chkS2() {
+  var done = stars > 0;
+  if (done) {
+    for (var i=0; i<S2Q.length; i++) {
+      if (S2Q[i].opts && !s2ans[S2Q[i].id]) { done = false; break; }
+    }
+  }
+  var btn = document.getElementById("s2-btn");
+  btn.disabled = !done;
+  btn.style.background = done ? "#E8820C" : "#333";
+  btn.style.color = done ? "#111" : "#555";
+}
+
+function doS2() {
+  send({type:"survey2", name:user.name, email:user.email, answers:s2ans, stars:stars, ts:new Date().toISOString()});
+  document.getElementById("tr-name").textContent = "🎉 Congrats, " + user.name + "!";
+  document.getElementById("cards-name").textContent = "🎉 " + user.name + "'s Collection!";
+  mapStage = "map";
+  document.getElementById("map-pin").classList.remove("show");
+  document.getElementById("map-chest").classList.remove("show");
+  document.getElementById("tr-btn").style.display = "block";
+  document.getElementById("tr-btn").textContent = "Find My Cards 🗺️";
+  go("treasure");
+}
+
+/* ── TREASURE ───────────────────────────── */
+function trNext() {
+  if (mapStage === "map") {
+    mapStage = "pin";
+    document.getElementById("map-pin").classList.add("show");
+    document.getElementById("tr-btn").textContent = "I Found It! 📍";
+  } else if (mapStage === "pin") {
+    mapStage = "chest";
+    document.getElementById("map-chest").classList.add("show");
+    document.getElementById("tr-btn").style.display = "none";
+  }
+}
+
+function openChest() {
+  document.getElementById("chest-em").textContent = "🎊";
+  document.getElementById("chest-em").style.animation = "chestPop .5s ease both";
+  document.getElementById("chest-tip").style.display = "none";
+  setTimeout(function() {
+    buildCards();
+    go("cards");
+  }, 700);
+}
+
+/* ── CARDS ──────────────────────────────── */
+function buildCards() {
+  var gridHtml = "";
+  for (var i=0; i<6; i++) {
+    var c = CARDS[i];
+    var delay = (i * 0.07).toFixed(2);
+    gridHtml += '<div class="cc" style="background:'+c.bg+';border-color:'+c.clr+'30;animation-delay:'+delay+'s" onclick="viewCard('+c.id+')">'
+      + '<div class="cc-rar" style="color:'+RC[c.rar]+';background:'+RBG[c.rar]+'">'+c.rar+'</div>'
+      + '<div class="cc-em">'+c.em+'</div>'
+      + '<div class="cc-nm" style="color:'+c.clr+'">'+c.name+'</div>'
+      + '<div class="cc-sb">'+c.sub+'</div></div>';
+  }
+  document.getElementById("cgrid").innerHTML = gridHtml;
+  var c7 = CARDS[6];
+  document.getElementById("c7wrap").innerHTML = '<div class="cc7" style="background:'+c7.bg+';border-color:'+c7.clr+'" onclick="viewCard(7)">'
+    + '<div style="font-size:46px">'+c7.em+'</div>'
+    + '<div style="text-align:left">'
+    + '<div style="font-size:8px;color:'+RC[c7.rar]+';letter-spacing:2px;font-weight:900;margin-bottom:4px">'+c7.rar+'</div>'
+    + '<div style="font-size:20px;font-weight:900;color:'+c7.clr+';line-height:1.1;margin-bottom:2px">'+c7.name+'</div>'
+    + '<div style="font-size:10px;color:#555">'+c7.sub+'</div>'
+    + '</div></div>';
+}
+
+function viewCard(id) {
+  var c = null;
+  for (var i=0; i<CARDS.length; i++) { if (CARDS[i].id === id) { c = CARDS[i]; break; } }
+  if (!c) return;
+  document.getElementById("card-detail").innerHTML =
+    '<div style="background:'+c.bg+';border-radius:22px;padding:28px;border:2px solid '+c.clr+';text-align:center">'
+    + '<div style="font-size:10px;color:'+RC[c.rar]+';letter-spacing:3px;font-weight:900;margin-bottom:14px;background:'+RBG[c.rar]+';padding:4px 12px;border-radius:20px;display:inline-block">'+c.rar+'</div>'
+    + '<div style="font-size:76px;margin-bottom:12px">'+c.em+'</div>'
+    + '<div style="font-size:28px;font-weight:900;color:'+c.clr+';margin-bottom:4px">'+c.name+'</div>'
+    + '<div style="font-size:11px;color:#888;margin-bottom:18px;letter-spacing:1px">'+c.sub+'</div>'
+    + '<div style="font-size:13px;color:#CCC;line-height:1.75;font-style:italic;padding:16px 0;border-top:1px solid #222;border-bottom:1px solid #222;margin-bottom:16px">"'+c.desc+'"</div>'
+    + '<div style="font-size:10px;color:#444;letter-spacing:1px">FIFA 2026 · Oakland, CA · Card '+c.id+' of 7</div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:#555;text-align:center;margin-top:14px">Card '+c.id+' of 7 · Finance is Freedom Agency</div>';
+  prevScreen = "cards";
+  go("card-detail");
+}
+
+/* ── INIT ───────────────────────────────── */
+window.onload = function() {
+  go("gate");
+};
+</script>
+</body>
+</html>
